@@ -11,12 +11,13 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ListBox Margin="20" ItemsSource="{Binding Items}">
+        <ListBox Name="ListBox"  Margin="20" ItemsSource="{Binding Items}" MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Name}" Width="100"/>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Age}" Width="100" />                        <Image HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" MaxHeight="50" MaxWidth="50" Source="{Binding Path=PersonImage}"></Image>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Age}" Width="100" />                        
+                        <Image HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" MaxHeight="50" MaxWidth="50" Source="{Binding Path=PersonImage}"></Image>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

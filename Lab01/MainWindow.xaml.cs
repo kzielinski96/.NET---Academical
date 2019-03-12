@@ -24,8 +24,8 @@ namespace Lab01
     {
         ObservableCollection<Person> people = new ObservableCollection<Person>
         {
-            new Person { Name = "P1", Age = 1 },
-            new Person { Name = "P2", Age = 2 }
+            new Person {Name = "P1", Age = 1},
+            new Person {Name = "P2", Age = 2}
         };
 
         public ObservableCollection<Person> Items
@@ -39,12 +39,14 @@ namespace Lab01
             DataContext = this;
         }
 
+
         private void AddImage_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog op = new Microsoft.Win32.OpenFileDialog();
 
             op.DefaultExt = ".png";
-            op.Filter = "JPEG Files (*.jpeg)|*.jpeg|PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg|GIF Files (*.gif)|*.gif";
+            op.Filter =
+                "JPEG Files (*.jpeg)|*.jpeg|PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg|GIF Files (*.gif)|*.gif";
 
             if (op.ShowDialog() == true)
             {
@@ -64,7 +66,17 @@ namespace Lab01
 
         private void AddNewPersonButton_Click(object sender, RoutedEventArgs e)
         {
-             people.Add(new Person { Age = int.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage });
+            people.Add(new Person
+                {Age = int.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage});
+        }
+
+
+        private void ListBox_MouseDoubleClick(object sender, EventArgs e)
+        {
+            Person person = ListBox.SelectedItem as Person;
+            nameTextBox.Text = person.Name;
+            ageTextBox.Text = person.Age.ToString();
+            image.Source = person.PersonImage;
         }
     }
 }
