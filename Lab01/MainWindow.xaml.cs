@@ -52,10 +52,19 @@ namespace Lab01
             }
         }
 
+        private void AgeTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (System.Text.RegularExpressions.Regex.IsMatch(ageTextBox.Text, "[^0-9]"))
+            {
+                MessageBox.Show("Please enter only digits.");
+                ageTextBox.Text = ageTextBox.Text.Remove(ageTextBox.Text.Length - 1);
+            }
+        }
+
 
         private void AddNewPersonButton_Click(object sender, RoutedEventArgs e)
         {
-            people.Add(new Person { Age = int.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage });
+             people.Add(new Person { Age = int.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage });
         }
     }
 }
