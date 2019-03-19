@@ -2,7 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,6 +40,7 @@ namespace Lab01
         public MainWindow()
         {
             InitializeComponent();
+            GetDataTask();
             DataContext = this;
         }
 
@@ -77,6 +82,37 @@ namespace Lab01
             nameTextBox.Text = person.Name;
             ageTextBox.Text = person.Age.ToString();
             image.Source = person.PersonImage;
+        }
+
+        private void GetDataTask()
+        {
+            WebClient client = new WebClient();
+            int i = 1;
+            Uri remoteUri1 = new Uri("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt");
+            Random random = new Random();
+
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    Uri remoteUri = new Uri("https://source.unsplash.com/random/300x20" + i.ToString());
+                    
+                    Dispatcher.Invoke(() => { 
+                        client.DownloadFile(remoteUri, "C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg");
+                        String htmlText = client.DownloadString(remoteUri1);
+                        String[] words = htmlText.Split('\n');
+                        String name = words[random.Next(0, words.Length)];
+                        int age = random.Next(0, 50);
+                        image.Source = new BitmapImage(new Uri("C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg"));
+                        people.Add(new Person{ Age = age, Name = name, PersonImage = image.Source as BitmapImage});
+                        i++;
+                    });
+
+                    await Task.Delay(5000);
+
+        }
+    });
         }
     }
 }
