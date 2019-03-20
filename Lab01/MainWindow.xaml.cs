@@ -26,6 +26,8 @@ namespace Lab01
     /// </summary>
     public partial class MainWindow : Window
     {
+        WebClient client = new WebClient();
+
         ObservableCollection<Person> people = new ObservableCollection<Person>
         {
             new Person {Name = "P1", Age = 1},
@@ -63,7 +65,7 @@ namespace Lab01
         {
             if (System.Text.RegularExpressions.Regex.IsMatch(ageTextBox.Text, "[^0-9]"))
             {
-                MessageBox.Show("Please enter only digits.");
+                MessageBox.Show("Please enter digits only.");
                 ageTextBox.Text = ageTextBox.Text.Remove(ageTextBox.Text.Length - 1);
             }
         }
@@ -86,11 +88,11 @@ namespace Lab01
 
         private void GetDataTask()
         {
-            WebClient client = new WebClient();
             int i = 1;
             Uri remoteUri1 = new Uri("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt");
+            String htmlText = client.DownloadString(remoteUri1);
+            String[] words = htmlText.Split('\n');
             Random random = new Random();
-
 
             Task.Run(async () =>
             {
@@ -100,8 +102,6 @@ namespace Lab01
                     
                     Dispatcher.Invoke(() => { 
                         client.DownloadFile(remoteUri, "C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg");
-                        String htmlText = client.DownloadString(remoteUri1);
-                        String[] words = htmlText.Split('\n');
                         String name = words[random.Next(0, words.Length)];
                         int age = random.Next(0, 50);
                         image.Source = new BitmapImage(new Uri("C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg"));
