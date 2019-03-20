@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,7 +27,11 @@ namespace Lab01
     /// </summary>
     public partial class MainWindow : Window
     {
-        WebClient client = new WebClient();
+        // private fields necessary in getting data from the internet 
+        private static WebClient client = new WebClient();
+        private static Uri remoteUri1 = new Uri("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt");
+        private static String htmlText = client.DownloadString(remoteUri1);
+        private static String[] words = htmlText.Split('\n');
 
         ObservableCollection<Person> people = new ObservableCollection<Person>
         {
@@ -86,30 +91,26 @@ namespace Lab01
             image.Source = person.PersonImage;
         }
 
-        private void GetDataTask()
+        private async void GetDataTask()
         {
-            int i = 1;
-            Uri remoteUri1 = new Uri("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt");
-            String htmlText = client.DownloadString(remoteUri1);
-            String[] words = htmlText.Split('\n');
+            int i = 10;
             Random random = new Random();
 
-            Task.Run(async () =>
+            await Task.Run(() =>
             {
                 while (true)
                 {
-                    Uri remoteUri = new Uri("https://source.unsplash.com/random/300x20" + i.ToString());
-                    
+                    Uri remoteUri = new Uri("https://source.unsplash.com/random/400x3" + i.ToString());
+                    client.DownloadFile(remoteUri, "C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg");
+                    String name = words[random.Next(0, words.Length)];
+                    int age = random.Next(0, 50);
+
                     Dispatcher.Invoke(() => { 
-                        client.DownloadFile(remoteUri, "C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg");
-                        String name = words[random.Next(0, words.Length)];
-                        int age = random.Next(0, 50);
-                        image.Source = new BitmapImage(new Uri("C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg"));
-                        people.Add(new Person{ Age = age, Name = name, PersonImage = image.Source as BitmapImage});
-                        i++;
+                        people.Add(new Person{ Age = age, Name = name, PersonImage = new BitmapImage(new Uri("C:/Users/Korni/Desktop/platformy/.NET---Academical/img/" + i.ToString() + ".jpg"))});
                     });
 
-                    await Task.Delay(5000);
+                    i++;
+                    Thread.Sleep(5000);
 
         }
     });
