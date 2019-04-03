@@ -19,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lab01
 {
@@ -32,6 +34,8 @@ namespace Lab01
         private static Uri remoteUri1 = new Uri("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt");
         private static String htmlText = client.DownloadString(remoteUri1);
         private static String[] words = htmlText.Split('\n');
+        private static Random random = new Random();
+
 
         ObservableCollection<Person> people = new ObservableCollection<Person>
         {
@@ -47,7 +51,8 @@ namespace Lab01
         public MainWindow()
         {
             InitializeComponent();
-            GetDataTask();
+//            GetDataTask();
+            GetWeatherData();
             DataContext = this;
         }
 
@@ -68,7 +73,7 @@ namespace Lab01
 
         private void AgeTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (System.Text.RegularExpressions.Regex.IsMatch(ageTextBox.Text, "[^0-9]"))
+            if (System.Text.RegularExpressions.Regex.IsMatch(ageTextBox.Text, "[^0-9]+[^.[0-9]+]?"))
             {
                 MessageBox.Show("Please enter digits only.");
                 ageTextBox.Text = ageTextBox.Text.Remove(ageTextBox.Text.Length - 1);
@@ -79,7 +84,7 @@ namespace Lab01
         private void AddNewPersonButton_Click(object sender, RoutedEventArgs e)
         {
             people.Add(new Person
-                {Age = int.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage});
+                {Age = double.Parse(ageTextBox.Text), Name = nameTextBox.Text, PersonImage = image.Source as BitmapImage});
         }
 
 
@@ -94,7 +99,6 @@ namespace Lab01
         private async void GetDataTask()
         {
             int i = 10;
-            Random random = new Random();
 
             await Task.Run(() =>
             {
@@ -112,8 +116,51 @@ namespace Lab01
                     i++;
                     Thread.Sleep(5000);
 
+                }
+            });
         }
-    });
+
+        private async void GetWeatherData()
+        {
+            string apiKey = "747fe0e760b5276cc648effd30d3a2a8";
+            string apiBaseUrl = "https://api.openweathermap.org/data/2.5/weather";
+
+
+
+            await Task.Run(() =>
+            {
+                using (var client = new WebClient())
+                {
+                    while (true)
+                    {
+                        double lat = random.Next(35, 71);
+                        double lon = random.Next(-9, 68);
+                        string apiCall = apiBaseUrl + "?lat=" + lat + "&lon=" + lon + "&apikey=" + apiKey +
+                                         "&mode=json&units=metric";
+//                        String apiCall =
+//                            "https://api.openweathermap.org/data/2.5/weather?lat=51&lon=17&apikey=747fe0e760b5276cc648effd30d3a2a8&mode=json&units=metric";
+
+                        String jsonString = client.DownloadString(apiCall);
+                        var jsonObject = JsonConvert.DeserializeObject<JObject>(jsonString);
+                        String name = jsonObject["name"].ToString();
+                        String temp = jsonObject["main"]["temp"].ToString();
+
+                        if (name == "")
+                        {
+                            name = "Ocean or Sea";
+                        }
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                people.Add(new Person {Age = double.Parse(temp), Name = name});
+                            });
+
+                        Thread.Sleep(5000);
+                    }
+                }
+            });
+
+
         }
     }
 }
